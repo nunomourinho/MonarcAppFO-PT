@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "80:80"
+      - "8080:8080"
+      - "5000:5000"
+    volumes:
+      - .:/var/www/html
+    environment:
+      - DBPASSWORD_ADMIN=pwdPwd2020
+      - DBUSER_ADMIN=root
+      - DBUSER_MONARC=sqlmonarcuser
+      - DBPASSWORD_MONARC=pwdPwd2020
+      - DBNAME_COMMON=monarc_common
+      - DBNAME_CLI=monarc_cli
+      - DBNAME_MASTER=monarc_master
+      - STATS_DB_USER=statsserviceuser
+      - STATS_DB_PASSWORD=password
+      - ENVIRONMENT=production
+    command: ["/bin/bash", "-c", "service mariadb start && apachectl -D FOREGROUND"]
+
+  db:
+    image: mariadb:10.5
+    environment:
+      MYSQL_ROOT_PASSWORD: pwdPwd2020
+      MYSQL_DATABASE: monarc_common
+      MYSQL_USER: sqlmonarcuser
+      MYSQL_PASSWORD: pwdPwd2020
+    volumes:
+      - db_data:/var/lib/mysql
+
+  stats-service:
+    build: .
+    environment:
+      FLASK_APP: runserver.py
+      STATS_CONFIG: production.py
+    ports:
+      - "5000:5000"
+
+volumes:
+  db_data:
