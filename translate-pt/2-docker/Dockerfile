@@ -35,7 +35,7 @@ ENV STATS_DB_NAME=statsservice
 ENV STATS_DB_USER=statsserviceuser
 ENV STATS_DB_PASSWORD=password
 
-# Install base packages
+# Install base packages and PHP 8.1
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y software-properties-common && \
     add-apt-repository ppa:ondrej/php -y && \
@@ -75,10 +75,13 @@ RUN a2enmod rewrite ssl headers && \
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
     composer self-update
 
-# Install MONARC
+# Install MONARC with dependency fix
 RUN git clone --config core.fileMode=false https://github.com/monarc-project/MonarcAppFO $PATH_TO_MONARC_FO && \
     git clone --config core.fileMode=false https://github.com/monarc-project/MonarcAppBO $PATH_TO_MONARC_BO && \
-    cd $PATH_TO_MONARC_FO && composer update --no-interaction && \
+    sed -i 's/"php": "\^7.4 || \^8.0"/"php": "\^7.4 || \^8.1"/' $PATH_TO_MONARC_FO/composer.json && \
+    sed -i 's/"ocramius\/proxy-manager": "[^"]*"/"ocramius\/proxy-manager": "2.13.1"/' $PATH_TO_MONARC_FO/composer.json && \
+    sed -i 's/"monarc\/core": "[^"]*"/"monarc\/core": "dev-master"/' $PATH_TO_MONARC_FO/composer.json && \
+    cd $PATH_TO_MONARC_FO && composer update --no-interaction --with-all-dependencies -vvv 2>&1 | tee /var/www/html/MonarcAppFO/composer-debug.log && \
     mkdir -p module/Monarc && cd module/Monarc && \
     ln -sfn ./../../vendor/monarc/core Core && \
     ln -sfn ./../../vendor/monarc/frontoffice FrontOffice && \
@@ -87,7 +90,7 @@ RUN git clone --config core.fileMode=false https://github.com/monarc-project/Mon
     git clone --config core.fileMode=false https://github.com/monarc-project/ng-anr.git ng_anr
 
 # Set up BO modules
-RUN cd $PATH_TO_MONARC_BO && composer update --no-interaction && \
+RUN cd $PATH_TO_MONARC_BO && composer update --no-interaction -vvv 2>&1 | tee /var/www/html/MonarcAppBO/composer-debug.log && \
     mkdir -p module/Monarc && cd module/Monarc && \
     ln -sfn ./../../vendor/monarc/core Core && \
     ln -sfn ./../../vendor/monarc/backoffice BackOffice && \

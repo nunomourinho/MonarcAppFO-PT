@@ -4,9 +4,9 @@ services:
   web:
     build: .
     ports:
-      - "80:80"
+      - "88:80"
       - "8080:8080"
-      - "5000:5000"
+      - "5001:5000"
     volumes:
       - .:/var/www/html
     environment:
@@ -30,7 +30,7 @@ services:
       MYSQL_USER: sqlmonarcuser
       MYSQL_PASSWORD: pwdPwd2020
     volumes:
-      - db_data:/var/lib/mysql
+      - ./mysql_data:/var/lib/mysql
 
   stats-service:
     build: .
@@ -38,7 +38,8 @@ services:
       FLASK_APP: runserver.py
       STATS_CONFIG: production.py
     ports:
-      - "5000:5000"
+      - "5002:5000"
 
 volumes:
   db_data:
+    external: false
