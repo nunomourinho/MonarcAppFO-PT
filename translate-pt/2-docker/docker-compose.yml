@@ -4,11 +4,13 @@ services:
   mariadb:
     image: mariadb:10.5
     container_name: monarc_db
+    env_file:
+      - .env
     environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_USER: monarc
-      MYSQL_PASSWORD: password
-      MYSQL_DATABASE: monarc_common
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
     volumes:
       - db_data:/var/lib/mysql
     networks:
@@ -25,6 +27,19 @@ services:
       - monarc_network
     depends_on:
       - mariadb
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: mariadb
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "8081:80"
+    depends_on:
+      - mariadb
+    networks:
+      - monarc_network
 
 volumes:
   db_data:
