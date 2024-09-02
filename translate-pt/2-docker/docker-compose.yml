@@ -1,45 +1,34 @@
 version: '3.8'
 
 services:
-  web:
-    build: .
-    ports:
-      - "88:80"
-      - "8080:8080"
-      - "5001:5000"
-    volumes:
-      - .:/var/www/html
-    environment:
-      - DBPASSWORD_ADMIN=pwdPwd2020
-      - DBUSER_ADMIN=root
-      - DBUSER_MONARC=sqlmonarcuser
-      - DBPASSWORD_MONARC=pwdPwd2020
-      - DBNAME_COMMON=monarc_common
-      - DBNAME_CLI=monarc_cli
-      - DBNAME_MASTER=monarc_master
-      - STATS_DB_USER=statsserviceuser
-      - STATS_DB_PASSWORD=password
-      - ENVIRONMENT=production
-    command: ["/bin/bash", "-c", "service mariadb start && apachectl -D FOREGROUND"]
-
-  db:
+  mariadb:
     image: mariadb:10.5
+    container_name: monarc_db
     environment:
-      MYSQL_ROOT_PASSWORD: pwdPwd2020
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_USER: monarc
+      MYSQL_PASSWORD: password
       MYSQL_DATABASE: monarc_common
-      MYSQL_USER: sqlmonarcuser
-      MYSQL_PASSWORD: pwdPwd2020
     volumes:
-      - ./mysql_data:/var/lib/mysql
+      - db_data:/var/lib/mysql
+    networks:
+      - monarc_network
 
-  stats-service:
+  apache:
     build: .
-    environment:
-      FLASK_APP: runserver.py
-      STATS_CONFIG: production.py
+    container_name: monarc_apache
     ports:
-      - "5002:5000"
+      - "8080:80"
+    volumes:
+      - web_data:/var/lib/monarc
+    networks:
+      - monarc_network
+    depends_on:
+      - mariadb
 
 volumes:
   db_data:
-    external: false
+  web_data:
+
+networks:
+  monarc_network:
