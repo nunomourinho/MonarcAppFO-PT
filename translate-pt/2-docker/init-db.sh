@@ -43,6 +43,11 @@ if [ -z "$MONARC_VERSION" ]; then
 fi
 mysql -h mariadb -u ${MYSQL_USER} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE} < /var/lib/monarc/releases/MonarcAppFO-$MONARC_VERSION/db-bootstrap/monarc_structure.sql
 mysql -h mariadb -u ${MYSQL_USER} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE} < /var/lib/monarc/releases/MonarcAppFO-$MONARC_VERSION/db-bootstrap/monarc_data.sql
+
+#mysql -h mariadb -u ${MYSQL_USER} -p${MYSQL_PASSWORD} monarc_cli < /var/lib/monarc/releases/MonarcAppFO-$MONARC_VERSION/db-bootstrap/monarc_structure.sql
+#mysql -h mariadb -u ${MYSQL_USER} -p${MYSQL_PASSWORD} monarc_cli < /var/lib/monarc/releases/MonarcAppFO-$MONARC_VERSION/db-bootstrap/monarc_data.sql
+
+
 echo "MONARC databases initialized."
 
 # Copy and configure local.php
@@ -54,26 +59,33 @@ cp /var/lib/monarc/releases/MonarcAppFO-$MONARC_VERSION/config/autoload/local.ph
 sed -i "s/'host' => '.*'/'host' => 'mariadb'/g" /var/lib/monarc/releases/MonarcAppFO-$MONARC_VERSION/config/autoload/local.php
 sed -i "s/'user' => '.*'/'user' => '${MYSQL_USER}'/g" /var/lib/monarc/releases/MonarcAppFO-$MONARC_VERSION/config/autoload/local.php
 sed -i "s/'password' => '.*'/'password' => '${MYSQL_PASSWORD}'/g" /var/lib/monarc/releases/MonarcAppFO-$MONARC_VERSION/config/autoload/local.php
-sed -i "s/'dbname' => '.*'/'dbname' => '${MYSQL_DATABASE}'/g" /var/lib/monarc/releases/MonarcAppFO-$MONARC_VERSION/config/autoload/local.php
+#sed -i "s/'dbname' => '.*'/'dbname' => '${MYSQL_DATABASE}'/g" /var/lib/monarc/releases/MonarcAppFO-$MONARC_VERSION/config/autoload/local.php
 
 
 # Update the host, user, and password in local.php
-sed -i "s/'host' => '.*'/'host' => 'mariadb'/g" /var/lib/monarc/releases/MonarcAppFO-$MONARC_VERSION/config/autoload/global.php
-sed -i "s/'user' => '.*'/'user' => '${MYSQL_USER}'/g" /var/lib/monarc/releases/MonarcAppFO-$MONARC_VERSION/config/autoload/global.php
-sed -i "s/'password' => '.*'/'password' => '${MYSQL_PASSWORD}'/g" /var/lib/monarc/releases/MonarcAppFO-$MONARC_VERSION/config/autoload/global.php
-sed -i "s/'dbname' => '.*'/'dbname' => '${MYSQL_DATABASE}'/g" /var/lib/monarc/releases/MonarcAppFO-$MONARC_VERSION/config/autoload/global.php
+#sed -i "s/'host' => '.*'/'host' => 'mariadb'/g" /var/lib/monarc/releases/MonarcAppFO-$MONARC_VERSION/config/autoload/global.php
+#sed -i "s/'user' => '.*'/'user' => '${MYSQL_USER}'/g" /var/lib/monarc/releases/MonarcAppFO-$MONARC_VERSION/config/autoload/global.php
+#sed -i "s/'password' => '.*'/'password' => '${MYSQL_PASSWORD}'/g" /var/lib/monarc/releases/MonarcAppFO-$MONARC_VERSION/config/autoload/global.php
+#sed -i "s/'dbname' => '.*'/'dbname' => '${MYSQL_DATABASE}'/g" /var/lib/monarc/releases/MonarcAppFO-$MONARC_VERSION/config/autoload/global.php
 
 # Migrate MONARC DB
 echo "Migrating MONARC DB..."
 
 cd /var/lib/monarc/fo
-php ./vendor/robmorgan/phinx/bin/phinx migrate -c module/Monarc/Core/migrations/phinx.php || exit 0
+echo php ./vendor/robmorgan/phinx/bin/phinx migrate -c module/Monarc/FrontOffice/migrations/phinx.php
 php ./vendor/robmorgan/phinx/bin/phinx migrate -c module/Monarc/FrontOffice/migrations/phinx.php || exit 0
+
 echo "MONARC DB migration completed."
 
 # Create initial user
 echo "Creating initial MONARC user..."
+echo php ./vendor/robmorgan/phinx/bin/phinx seed:run -c module/Monarc/FrontOffice/migrations/phinx.php
 php ./vendor/robmorgan/phinx/bin/phinx seed:run -c module/Monarc/FrontOffice/migrations/phinx.php || exit 0
 echo "Initial MONARC user created."
+
+echo php ./vendor/robmorgan/phinx/bin/phinx migrate -c module/Monarc/Core/migrations/phinx.php
+php ./vendor/robmorgan/phinx/bin/phinx migrate -c module/Monarc/Core/migrations/phinx.php || exit 0
+echo "MONARC DB migration completed fase II."
+
 
 echo "init-db.sh script completed."
