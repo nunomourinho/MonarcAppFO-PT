@@ -1,6 +1,14 @@
 #!/bin/bash
 set -e
 
+FLAG_FILE="/var/lib/monarc/.initialized"
+
+# If the flag file exists, skip initialization
+if [ -f "$FLAG_FILE" ]; then
+    echo "Database is already initialized. Skipping init-db.sh..."
+    exit 0
+fi
+
 # Load environment variables from .env file
 export $(grep -v '^#' /docker-entrypoint-initdb.d/.env | xargs)
 
@@ -65,9 +73,16 @@ php ./vendor/robmorgan/phinx/bin/phinx migrate -c module/Monarc/Core/migrations/
 
 echo "Database migration and seeding completed."
 
+# Create the flag file at the end of the initialization process
+touch "$FLAG_FILE"
+ls -alh /var/lib/monarc
+
+echo "init-db.sh completed. Flag file created."
+
 # Run the Python translation script using the virtual environment
 echo "Running 3-translate-db.py to translate the database..."
-/usr/src/app/venv/bin/python /usr/src/app/3-translate-db.py && exit 0
+/usr/src/app/venv/bin/python /usr/src/app/3-translate-db.py || return 0
 echo "Database translation completed."
 
 echo "init-db.sh script completed."
+

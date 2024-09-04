@@ -1,6 +1,12 @@
 # Use official PHP image with Apache
 FROM php:8.1-apache
 
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get dist-upgrade -y && \
+    apt-get autoremove -y && \
+    apt-get clean
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     zip \
