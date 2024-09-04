@@ -33,7 +33,7 @@ RUN a2dismod status
 RUN a2enmod ssl rewrite headers
 
 # Copy Apache configuration
-COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
+COPY helper/000-default.conf /etc/apache2/sites-available/000-default.conf
 
 # Copy .env file
 COPY .env /docker-entrypoint-initdb.d/.env
@@ -65,14 +65,14 @@ RUN mkdir -p /var/lib/monarc/releases/ && \
 RUN python3 -m venv /usr/src/app/venv
 
 # Activate the virtual environment and install Python dependencies
-COPY requirements.txt /usr/src/app/requirements.txt
+COPY helper/requirements.txt /usr/src/app/requirements.txt
 RUN /usr/src/app/venv/bin/pip install --upgrade pip && \
     /usr/src/app/venv/bin/pip install -r /usr/src/app/requirements.txt
 
 # Copy database initialization script and the Python translation script
-COPY init-db.sh /docker-entrypoint-initdb.d/init-db.sh
-COPY 3-translate-db.py /usr/src/app/3-translate-db.py
-COPY final_translated_strings.csv /usr/src/app/final_translated_strings.csv
+COPY helper/init-db.sh /docker-entrypoint-initdb.d/init-db.sh
+COPY helper/3-translate-db.py /usr/src/app/3-translate-db.py
+COPY helper/final_translated_strings.csv /usr/src/app/final_translated_strings.csv
 RUN chmod +x /docker-entrypoint-initdb.d/init-db.sh
 
 # Set the working directory
