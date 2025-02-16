@@ -1,0 +1,39 @@
+version: '3'
+services:
+
+  db:
+    image: postgres:latest
+    hostname: db
+    container_name: mosp_db
+    restart: always
+    environment:
+      - POSTGRES_USER=mosp
+      - POSTGRES_PASSWORD=mosp
+      - POSTGRES_DB=mosp
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+  mosp:
+    build: .
+    container_name: mosp
+    working_dir: /mosp
+    tty: true
+    environment:
+        - MOSP_CONFIG=docker.py
+        - HOST=0.0.0.0
+        - PORT=5000
+    command: "./entrypoint.sh"
+    volumes:
+      - mosp_data:/mosp:rw  # Aqui é onde o volume nomeado é utilizado
+      - mosp_static:/mosp/static  # Outro volume nomeado para a pasta static
+    ports:
+        - "5000:5000"
+    expose:
+        - "5000"
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
+  mosp_data:  # Declaração do volume nomeado mosp_data
+  mosp_static:  # Declaração do volume nomeado mosp_static

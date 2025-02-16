@@ -26,6 +26,16 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install mysqli pdo pdo_mysql \
     && apt-get clean
 
+RUN apt update && apt install -y \
+    libzip-dev libpng-dev libjpeg-dev libfreetype6-dev \
+    && docker-php-ext-install zip gd pdo_mysql mbstring bcmath
+
+RUN pecl install xdebug \
+    && docker-php-ext-enable xdebug
+
+RUN apt update && apt install -y libicu-dev \
+    && docker-php-ext-install intl
+
 # Disable module status
 RUN a2dismod status
 
