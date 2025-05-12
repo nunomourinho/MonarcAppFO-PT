@@ -18,3 +18,4 @@ bash traduz-pt.sh
 ```
 
 
+4) Pra usar as traduções, escolher no interface a lingua portuguesa. Quando se cria o modelo de análise escolher a lingua inglesa
