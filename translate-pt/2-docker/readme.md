@@ -4,10 +4,14 @@
 
 ```
 docker-compose build
-docker-compose up -d
+docker-compose up
 ```
 
-Aguardar que todo o sistema arranque. Demora vários minutos
+Aguardar que todo o sistema arranque. Demora vários minutos. Quando todas as migrações estiverem concluidas, tecle em Ctrl+C para parar o docker. Depois execute:
+
+```
+docker-compose up -d
+```
 
 Depois entrar com o utilizador por defeito: admin@admin.localhost com a palavra passe admin
 
