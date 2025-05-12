@@ -12,7 +12,7 @@ Aguardar que todo o sistema arranque. Demora vários minutos
 Depois entrar com o utilizador por defeito: admin@admin.localhost com a palavra passe admin
 
 
-3) Para traduzir:
+3) Para traduzir, primeiro edite os modelos existentes na pasta helper/pt. Altere apenas logos e imagem. Depois execute:
 ```
 bash traduz-pt.sh
 ```
