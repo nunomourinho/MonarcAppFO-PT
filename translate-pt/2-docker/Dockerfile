@@ -89,6 +89,16 @@ COPY helper/3-translate-db.py /usr/src/app/3-translate-db.py
 COPY helper/final_translated_strings.csv /usr/src/app/final_translated_strings.csv
 RUN chmod +x /docker-entrypoint-initdb.d/init-db.sh
 
+# Criar diretório de cache e ajustar permissões
+RUN mkdir -p /var/lib/monarc/releases/MonarcAppFO-v2.13.3/data/cache \
+    && chown -R www-data:www-data /var/lib/monarc/releases/MonarcAppFO-v2.13.3/data \
+    && chmod -R 775 /var/lib/monarc/releases/MonarcAppFO-v2.13.3/data
+
+# Garantir estrutura de diretórios para ProxyManager
+RUN mkdir -p /var/lib/monarc/releases/MonarcAppFO-v2.13.3/data/LazyServices/Proxy \
+    && chown -R www-data:www-data /var/lib/monarc/releases/MonarcAppFO-v2.13.3/data \
+    && chmod -R 775 /var/lib/monarc/releases/MonarcAppFO-v2.13.3/data
+
 # Set the working directory
 WORKDIR /var/lib/monarc/fo
 
