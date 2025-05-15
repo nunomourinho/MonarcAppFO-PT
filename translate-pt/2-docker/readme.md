@@ -1,6 +1,8 @@
+0) Instalar Ubuntu 24.04, e depois instalar suporte ao docker-compose no ubuntu 24.04:
 ```
 apt install git docker-compose nano -y
-git clone 
+git clone https://github.com/nunomourinho/MonarcAppFO-PT.git
+cd MonarcAppFO-PT
 ```
 
 
