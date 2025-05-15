@@ -1,3 +1,8 @@
+```
+apt install git docker-compose nano -y
+git clone 
+```
+
 
 1) Editar ficheiro .env e escolher boas palavras passe para este projecto
 2) Para executar:
